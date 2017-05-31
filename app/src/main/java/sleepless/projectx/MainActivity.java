@@ -12,6 +12,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mLight, mGyro, mAcc;
+    private String x_axis = "", y_axis = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             tvlux.setText("" + event.values[0]);
         }
         if (sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            tvgyro.setText("" + event.values[0] + " " + event.values[1] + " " + event.values[2]);
+            if(event.values[0] >= 0.05)
+                x_axis = "right";
+            else if(event.values[0] <= -0.05)
+                x_axis = "left";
+            else
+                x_axis = "No Mov";
+            if(event.values[1] >= 0.05)
+                y_axis = "up";
+            else if(event.values[1] <= -0.05)
+                y_axis = "down";
+            else
+                y_axis = "No Mov";
+            tvgyro.setText("X-Axis: " + x_axis + " Y-Axis: " + y_axis);
         }
         if (sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             tvacc.setText("" + event.values[0] + " " + event.values[1] + " " + event.values[2]);
