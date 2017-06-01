@@ -1,4 +1,4 @@
-package sleepless.bt_mouse;
+package sleepless.bt_mouse_client;
 
 import org.junit.Test;
 

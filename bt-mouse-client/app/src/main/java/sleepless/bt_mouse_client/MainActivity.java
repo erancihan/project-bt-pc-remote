@@ -1,4 +1,4 @@
-package sleepless.bt_mouse;
+package sleepless.bt_mouse_client;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

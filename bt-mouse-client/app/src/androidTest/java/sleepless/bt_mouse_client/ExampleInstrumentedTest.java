@@ -1,4 +1,4 @@
-package sleepless.bt_mouse;
+package sleepless.bt_mouse_client;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("sleepless.bt_mouse", appContext.getPackageName());
+        assertEquals("sleepless.bt_mouse_client", appContext.getPackageName());
     }
 }
