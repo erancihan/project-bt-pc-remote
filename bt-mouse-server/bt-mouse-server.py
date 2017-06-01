@@ -3,7 +3,7 @@ import pyautogui
 import os
 
 server_socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-server_socket.bind(bluetooth.PORT_ANY)
+server_socket.bind(("",bluetooth.PORT_ANY))
 server_socket.listen(1)
 
 port = server_socket.getsockname()[1]

@@ -1,4 +1,4 @@
-package sleepless.bt_mouse_client;
+package com.example.theraiderman15.navdraw;
 
 import org.junit.Test;
 
