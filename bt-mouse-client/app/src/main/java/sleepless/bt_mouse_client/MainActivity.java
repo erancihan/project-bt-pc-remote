@@ -22,10 +22,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    private static final boolean DEBUG = true;
 
     // Message types sent from the BluetoothIO Handler
     public static final int MESSAGE_CONNECT = 1;
@@ -38,13 +38,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
 
-    private static final String TAG = "MainActivity";
+
     public static final String TOAST = "toast";
 
     private BluetoothAdapter mBluetoothAdapter = null;
-    private BluetoothIO mBluetoothIO = null;
+    public BluetoothIO mBluetoothIO = null;
 
-    private TouchPad mMouseView = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //mMouseView = (TouchPad) findViewById(R.id.);
+
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -103,53 +103,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     };
 
-    View.OnTouchListener touchpadListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            double eventX = ((double) event.getX()) / ((double)mMouseView.width) - 0.5;
-            double eventY = ((double) event.getY()) / ((double)mMouseView.height) - 0.5;
 
-            switch(event.getAction()){
-                case MotionEvent.ACTION_DOWN:
-                    sendActionDown(eventX, eventY);
-                    break;
 
-                case MotionEvent.ACTION_MOVE:
-                    sendActionMove(eventX, eventY);
-                    break;
 
-                case MotionEvent.ACTION_UP:
-                    sendActionUp(eventX, eventY);
-                    break;
-            }
-            return true;
-        }
-    };
-
-    public void sendActionDown(double x, double y){
-        if (DEBUG) Log.i(TAG, "press," + x + "," + y);
-        mBluetoothIO.sendMessage("actiondown," + String.format("%.3f", x) + "," + String.format("%.3f", y));
-    }
-
-    public void sendActionMove(double x, double y){
-        if (DEBUG) Log.i(TAG, "motion," + x + "," + y);
-        mBluetoothIO.sendMessage("actionmove," + String.format("%.3f", x) + "," + String.format("%.3f", y));
-    }
-
-    public void sendActionUp(double x, double y){
-        if (DEBUG) Log.i(TAG, "release," + x + "," + y);
-        mBluetoothIO.sendMessage("actionup," + String.format("%.3f", x) + "," + String.format("%.3f", y));
-    }
-
-    public void pageDownButton(View view){
-        if (DEBUG) Log.i(TAG, "pagedown");
-        mBluetoothIO.sendMessage("pagedown");
-    }
-
-    public void pageUpButton(View view){
-        if (DEBUG) Log.i(TAG, "pageup");
-        mBluetoothIO.sendMessage("pageup");
-    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -157,8 +113,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // When DeviceListActivity returns with a device to connect
                 if (resultCode == Activity.RESULT_OK) {
                     // Get the device MAC address
-                    String address = data.getExtras()
-                            .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+                    String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
                     // Get the BLuetoothDevice object
                     BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
                     // Attempt to connect to the device
@@ -217,7 +172,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.touchpad) {
-            fm.beginTransaction().replace(R.id.content_frame, new TouchpadFragment()).commit();
+            Fragment fragment = new TouchpadFragment();
+            ((TouchpadFragment) fragment).setBluetoothIO(mBluetoothIO);
+            fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
         } else if (id == R.id.sensor) {
             Intent serverIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
