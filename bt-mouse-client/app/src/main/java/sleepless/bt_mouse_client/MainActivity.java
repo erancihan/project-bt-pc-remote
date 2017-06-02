@@ -1,12 +1,16 @@
 package sleepless.bt_mouse_client;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,11 +23,26 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    private static final String TAG = "MainActivity";
+    private static final boolean DEBUG = true;
+
+    // Message types sent from the BluetoothIO Handler
+    public static final int MESSAGE_CONNECT = 1;
+    public static final int MESSAGE_DISCONNECT = 2;
+    public static final int MESSAGE_READ = 3;
+    public static final int MESSAGE_WRITE = 4;
+    public static final int MESSAGE_TOAST = 5;
+
+    // Intent request codes
+    private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
+
+    private static final String TAG = "MainActivity";
+    public static final String TOAST = "toast";
 
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothIO mBluetoothIO = null;
+
+    private TouchPad mMouseView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mMouseView = (TouchPad) findViewById(R.id.);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -64,9 +85,96 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-
+            switch (msg.what) {
+                case MESSAGE_CONNECT:
+                    //configureButtons(true);
+                    break;
+                case MESSAGE_DISCONNECT:
+                    //configureButtons(false);
+                    break;
+                case MESSAGE_READ:
+                    break;
+                case MESSAGE_TOAST:
+                    Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST), Toast.LENGTH_SHORT).show();
+                    break;
+            }
         }
     };
+
+    View.OnTouchListener touchpadListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            double eventX = ((double) event.getX()) / ((double)mMouseView.width) - 0.5;
+            double eventY = ((double) event.getY()) / ((double)mMouseView.height) - 0.5;
+
+            switch(event.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    sendActionDown(eventX, eventY);
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    sendActionMove(eventX, eventY);
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    sendActionUp(eventX, eventY);
+                    break;
+            }
+            return true;
+        }
+    };
+
+    public void sendActionDown(double x, double y){
+        if (DEBUG) Log.i(TAG, "press," + x + "," + y);
+        mBluetoothIO.sendMessage("actiondown," + String.format("%.3f", x) + "," + String.format("%.3f", y));
+    }
+
+    public void sendActionMove(double x, double y){
+        if (DEBUG) Log.i(TAG, "motion," + x + "," + y);
+        mBluetoothIO.sendMessage("actionmove," + String.format("%.3f", x) + "," + String.format("%.3f", y));
+    }
+
+    public void sendActionUp(double x, double y){
+        if (DEBUG) Log.i(TAG, "release," + x + "," + y);
+        mBluetoothIO.sendMessage("actionup," + String.format("%.3f", x) + "," + String.format("%.3f", y));
+    }
+
+    public void pageDownButton(View view){
+        if (DEBUG) Log.i(TAG, "pagedown");
+        mBluetoothIO.sendMessage("pagedown");
+    }
+
+    public void pageUpButton(View view){
+        if (DEBUG) Log.i(TAG, "pageup");
+        mBluetoothIO.sendMessage("pageup");
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE:
+                // When DeviceListActivity returns with a device to connect
+                if (resultCode == Activity.RESULT_OK) {
+                    // Get the device MAC address
+                    String address = data.getExtras()
+                            .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+                    // Get the BLuetoothDevice object
+                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+                    // Attempt to connect to the device
+                    mBluetoothIO.connect(device);
+                }
+                break;
+            case REQUEST_ENABLE_BT:
+                // When the request to enable Bluetooth returns
+                if (resultCode == Activity.RESULT_OK) {
+                    // Bluetooth is now enabled, so set up a chat session
+                    Toast.makeText(this, "Bluetooth Enabled", Toast.LENGTH_SHORT).show();
+                    mBluetoothIO = new BluetoothIO(this, mHandler);
+                } else {
+                    // User did not enable Bluetooth or an error occured
+                    Toast.makeText(this, "Bluetooth Not Enabled", Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
 
     @Override
     public void onBackPressed() {
@@ -121,13 +229,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     protected void onStop() {
         super.onStop();
-
-        if (mBluetoothIO != null) {
-            mBluetoothIO.stop();
-        }
     }
 
     protected void onDestroy() {
         super.onDestroy();
+
+        if (mBluetoothIO != null) {
+            mBluetoothIO.stop();
+        }
     }
 }
