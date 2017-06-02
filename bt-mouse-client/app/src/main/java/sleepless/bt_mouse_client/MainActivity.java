@@ -174,12 +174,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.touchpad) {
             TouchpadFragment fragment = new TouchpadFragment();
-            fragment.setBluetoothIO(mBluetoothIO);
-            fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
-        } else if (id == R.id.sensor) {
             Intent serverIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
-//            fm.beginTransaction().replace(R.id.content_frame, new SensorFragment()).commit();
+            fragment.setBluetoothIO(mBluetoothIO);
+            fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        } else if(id == R.id.keyboard){
+            KeyboardFragment fragment = new KeyboardFragment();
+            fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        }
+        else if (id == R.id.sensor) {
+            Intent serverIntent = new Intent(this, DeviceListActivity.class);
+            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+            fm.beginTransaction().replace(R.id.content_frame, new SensorFragment()).commit();
         } else if (id == R.id.settings) {
             SettingsFragment fragment = new SettingsFragment();
             fragment.setBluetoothIO(mBluetoothIO);
