@@ -2,28 +2,51 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="TouchPad" />
 
     <RelativeLayout
+        android:id="@+id/touchpadLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="467dp"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/textView4"
-        android:id="@+id/touchpadLayout"
-        >
+        android:layout_column="0"
+        android:layout_row="2">
 
         <sleepless.bt_mouse_client.TouchPad
             android:id="@+id/touchpadView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerInParent="true"
+            android:layout_alignParentEnd="true"
             android:background="@android:color/holo_purple"
             android:contentDescription="@string/touchpad" />
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_below="@+id/touchpadLayout"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:id="@+id/leftclick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_weight="1"
+            android:text="L" />
+
+        <Button
+            android:id="@+id/rightclick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_weight="1"
+            android:text="R" />
+
+    </LinearLayout>
+
 </RelativeLayout>

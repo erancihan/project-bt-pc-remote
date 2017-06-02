@@ -4,12 +4,13 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
 /**
@@ -18,17 +19,18 @@ import android.widget.RelativeLayout;
 
 public class TouchpadFragment extends Fragment {
     private static final String TAG = "MainActivity";
+    private static final boolean DEBUG = false;
     private SharedPreferences sp;
 
     private BluetoothIO mBluetoothIO;
-    private TouchPad mMouseView = null;
+    private TouchPad mTouchPad = null;
+    private Button mL = null, mR = null;
 
     private double prevX = 0, prevY = 0;
     private double initialX = 0, initialY = 0;
 
     public void setBluetoothIO(BluetoothIO io) {
         mBluetoothIO = io;
-
     }
 
     @Nullable
@@ -36,14 +38,36 @@ public class TouchpadFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.touchpad_layout, container, false);
         sp = getActivity().getSharedPreferences("AppData", Context.MODE_PRIVATE);
-        mMouseView = (TouchPad) view.findViewById(R.id.touchpadView);
         float cursorSpeed = sp.getInt("cursor_speed", 1);
         mBluetoothIO.sendMessage("actionspeed," + cursorSpeed);
+
+        mTouchPad = (TouchPad) view.findViewById(R.id.touchpadView);
+        mL = (Button) view.findViewById(R.id.leftclick);
+        mL.set
+        mR = (Button) view.findViewById(R.id.rightclick);
+
         RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.touchpadLayout);
         layout.setOnTouchListener(touchpadListener);
 
+        mL.setOnClickListener(leftclickListener);
+        mR.setOnClickListener(rightclicklistener);
+
         return view;
     }
+
+    View.OnClickListener rightclicklistener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            mBluetoothIO.sendMessage("actionrightclick");
+        }
+    };
+
+    View.OnClickListener leftclickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            mBluetoothIO.sendMessage("actionleftclick");
+        }
+    };
 
     View.OnTouchListener touchpadListener = new View.OnTouchListener() {
         @Override
@@ -56,16 +80,19 @@ public class TouchpadFragment extends Fragment {
                     prevY = eventY;
                     initialX = eventX;
                     initialY = eventY;
-                    System.out.println("For Down... X: " + initialX + " Y: " + initialY);
+                    if (DEBUG) { System.out.println("For Down... X: " + initialX + " Y: " + initialY); }
                     break;
-
                 case MotionEvent.ACTION_MOVE:
                     sendActionMove(eventX, eventY);
                     break;
                 case MotionEvent.ACTION_UP:
-                    System.out.println("For Up... X: " + eventX + " Y: " + eventY);
-                    if(Math.abs(initialX - eventX) < 50 && Math.abs(initialY - eventY) < 50)
-                        sendActionClick(eventX, eventY);
+                    if (DEBUG) { System.out.println("For Up... X: " + eventX + " Y: " + eventY); }
+                    if(Math.abs(initialX - eventX) < 50 && Math.abs(initialY - eventY) < 50) {
+                        mBluetoothIO.sendMessage("actionleftclick");
+                    }
+                    break;
+                default:
+                    break;
             }
             return true;
         }
@@ -75,9 +102,5 @@ public class TouchpadFragment extends Fragment {
         mBluetoothIO.sendMessage("actionmove," + (x - prevX) + "," + (y - prevY));
         prevX = x;
         prevY = y;
-    }
-
-    public void sendActionClick(double x, double y){
-        mBluetoothIO.sendMessage("actionleftclick");
     }
 }
