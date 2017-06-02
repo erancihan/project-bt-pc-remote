@@ -43,7 +43,6 @@ public class TouchpadFragment extends Fragment {
 
         mTouchPad = (TouchPad) view.findViewById(R.id.touchpadView);
         mL = (Button) view.findViewById(R.id.leftclick);
-        mL.set
         mR = (Button) view.findViewById(R.id.rightclick);
 
         RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.touchpadLayout);
