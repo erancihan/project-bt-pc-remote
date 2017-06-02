@@ -22,6 +22,8 @@ print("Waiting for connection from the application")
 client_socket, client_info = server_socket.accept()
 print("Successfully connected to the application")
 
+cursor_speed = 50
+
 while True:
     data = client_socket.recv(1024)
     if len(data) == 0:
@@ -43,3 +45,6 @@ while True:
                 pyautogui.moveRel(message_data[1], message_data[2])
             if message_data[0] == "execute_command":
                 os.system(message_data[1])
+            if message_data[0] == "set_speed":
+                cursor_speed = int(message_data[1]) * 10
+

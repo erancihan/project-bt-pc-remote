@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private BluetoothIO mBluetoothIO = null;
 
     private TouchPad mMouseView = null;
+    private double prevX = 0, prevY = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,8 +107,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     View.OnTouchListener touchpadListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            double eventX = ((double) event.getX()) / ((double)mMouseView.width) - 0.5;
-            double eventY = ((double) event.getY()) / ((double)mMouseView.height) - 0.5;
+            double eventX = ((double) event.getX());
+            double eventY = ((double) event.getY());
 
             switch(event.getAction()){
                 case MotionEvent.ACTION_DOWN:
@@ -132,8 +133,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void sendActionMove(double x, double y){
-        if (DEBUG) Log.i(TAG, "motion," + x + "," + y);
-        mBluetoothIO.sendMessage("actionmove," + String.format("%.3f", x) + "," + String.format("%.3f", y));
+
+        mBluetoothIO.sendMessage("actionmove," + String.format("%.3f", x - prevX) + "," + String.format("%.3f", y - prevY));
+        prevX = x;
+        prevY = y;
     }
 
     public void sendActionUp(double x, double y){
