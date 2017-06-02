@@ -43,6 +43,7 @@ while True:
     if (len(data) == 0):
         break
     data = data.decode("utf-8")
+    print(data)
     messages = data.split("<>")
     for message in messages:
         if (len(message) > 0):

@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private BluetoothAdapter mBluetoothAdapter = null;
     public BluetoothIO mBluetoothIO = null;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,10 +100,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     };
-
-
-
-
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
