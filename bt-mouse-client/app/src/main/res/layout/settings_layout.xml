@@ -5,7 +5,7 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <SeekBar
-        android:id="@+id/seekBar6"
+        android:id="@+id/cursor_speed"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -27,11 +27,11 @@
         android:layout_alignParentStart="true" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/save_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Forget Paired Device"
-        android:layout_below="@+id/seekBar6"
+        android:text="Save Settings"
+        android:layout_below="@+id/cursor_speed"
         android:layout_alignEnd="@+id/textView9"
         android:layout_marginTop="163dp" />
 

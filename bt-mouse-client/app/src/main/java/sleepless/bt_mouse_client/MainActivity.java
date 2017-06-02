@@ -5,7 +5,9 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -50,7 +52,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        SharedPreferences sp = getSharedPreferences("AppData", Context.MODE_PRIVATE);
+        if(sp.getInt("cursor_speed", -1) == -1){
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("cursor_speed", 1);
+            editor.commit();
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -166,15 +173,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.touchpad) {
-            Fragment fragment = new TouchpadFragment();
-            ((TouchpadFragment) fragment).setBluetoothIO(mBluetoothIO);
+            TouchpadFragment fragment = new TouchpadFragment();
+            fragment.setBluetoothIO(mBluetoothIO);
             fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
         } else if (id == R.id.sensor) {
             Intent serverIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
 //            fm.beginTransaction().replace(R.id.content_frame, new SensorFragment()).commit();
         } else if (id == R.id.settings) {
-            fm.beginTransaction().replace(R.id.content_frame, new SettingsFragment()).commit();
+            SettingsFragment fragment = new SettingsFragment();
+            fragment.setBluetoothIO(mBluetoothIO);
+            fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

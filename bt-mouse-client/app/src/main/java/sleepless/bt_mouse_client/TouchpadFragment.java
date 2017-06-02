@@ -1,6 +1,8 @@
 package sleepless.bt_mouse_client;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -15,25 +17,28 @@ import android.widget.RelativeLayout;
  */
 
 public class TouchpadFragment extends Fragment {
-    private static final boolean DEBUG = true;
     private static final String TAG = "MainActivity";
+    private SharedPreferences sp;
 
     private BluetoothIO mBluetoothIO;
     private TouchPad mMouseView = null;
 
     private double prevX = 0, prevY = 0;
+    private double initialX = 0, initialY = 0;
 
     public void setBluetoothIO(BluetoothIO io) {
         mBluetoothIO = io;
+
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.touchpad_layout, container, false);
-
+        sp = getActivity().getSharedPreferences("AppData", Context.MODE_PRIVATE);
         mMouseView = (TouchPad) view.findViewById(R.id.touchpadView);
-
+        float cursorSpeed = sp.getInt("cursor_speed", 1);
+        mBluetoothIO.sendMessage("actionspeed," + cursorSpeed);
         RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.touchpadLayout);
         layout.setOnTouchListener(touchpadListener);
 
@@ -47,45 +52,32 @@ public class TouchpadFragment extends Fragment {
             double eventY = ((double) event.getY());
             switch(event.getAction()){
                 case MotionEvent.ACTION_DOWN:
-                    sendActionDown(eventX, eventY);
+                    prevX = eventX;
+                    prevY = eventY;
+                    initialX = eventX;
+                    initialY = eventY;
+                    System.out.println("For Down... X: " + initialX + " Y: " + initialY);
                     break;
 
                 case MotionEvent.ACTION_MOVE:
                     sendActionMove(eventX, eventY);
                     break;
-
                 case MotionEvent.ACTION_UP:
-                    sendActionUp(eventX, eventY);
-                    break;
+                    System.out.println("For Up... X: " + eventX + " Y: " + eventY);
+                    if(Math.abs(initialX - eventX) < 50 && Math.abs(initialY - eventY) < 50)
+                        sendActionClick(eventX, eventY);
             }
             return true;
         }
     };
 
-    public void sendActionDown(double x, double y){
-        if (DEBUG) Log.i(TAG, "press," + x + "," + y);
-        mBluetoothIO.sendMessage("actiondown," + String.format("%.3f", x) + "," + String.format("%.3f", y));
-    }
-
     public void sendActionMove(double x, double y){
-
-        mBluetoothIO.sendMessage("actionmove," + String.format("%.3f", x - prevX) + "," + String.format("%.3f", y - prevY));
+        mBluetoothIO.sendMessage("actionmove," + (x - prevX) + "," + (y - prevY));
         prevX = x;
         prevY = y;
     }
 
-    public void sendActionUp(double x, double y){
-        if (DEBUG) Log.i(TAG, "release," + x + "," + y);
-        mBluetoothIO.sendMessage("actionup," + String.format("%.3f", x) + "," + String.format("%.3f", y));
-    }
-
-    public void pageDownButton(View view){
-        if (DEBUG) Log.i(TAG, "pagedown");
-        mBluetoothIO.sendMessage("pagedown");
-    }
-
-    public void pageUpButton(View view){
-        if (DEBUG) Log.i(TAG, "pageup");
-        mBluetoothIO.sendMessage("pageup");
+    public void sendActionClick(double x, double y){
+        mBluetoothIO.sendMessage("actionleftclick");
     }
 }
