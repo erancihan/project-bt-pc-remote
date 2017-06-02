@@ -219,7 +219,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.touchpad) {
             fm.beginTransaction().replace(R.id.content_frame, new TouchpadFragment()).commit();
         } else if (id == R.id.sensor) {
-            fm.beginTransaction().replace(R.id.content_frame, new SensorFragment()).commit();
+            Intent serverIntent = new Intent(this, DeviceListActivity.class);
+            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+//            fm.beginTransaction().replace(R.id.content_frame, new SensorFragment()).commit();
         } else if (id == R.id.settings) {
             fm.beginTransaction().replace(R.id.content_frame, new SettingsFragment()).commit();
         }
