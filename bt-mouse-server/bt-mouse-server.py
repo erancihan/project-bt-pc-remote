@@ -40,7 +40,7 @@ while True:
                 pyautogui.scroll(-10)
             if message_data[0] == "actionleftclick":
                 pyautogui.click()
-            if message_data[0] == "right_click":
+            if message_data[0] == "actionrightclick":
                 pyautogui.click(button='right')
             if message_data[0] == "actionmove":
                 try:

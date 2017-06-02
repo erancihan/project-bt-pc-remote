@@ -6,6 +6,9 @@
             android:id="@+id/touchpad"
             android:title="Touchpad" />
         <item
+            android:id="@+id/keyboard"
+            android:title="Settings" />
+        <item
             android:id="@+id/sensor"
             android:title="Sensors(Experimental)" />
         <item
