@@ -42,11 +42,12 @@ public class SettingsFragment extends Fragment {
     }
 
     public void saveSettings(View view){
-        System.out.println("Hello Ma Man");
+        System.out.println("Hello Ma Man"); //TODO DEBUG
         int value = seekBar.getProgress();
         mBluetoothIO.sendMessage("actionspeed," + value);
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt("cursor_speed", value);
         editor.commit();
+        //todo toast message
     }
 }
