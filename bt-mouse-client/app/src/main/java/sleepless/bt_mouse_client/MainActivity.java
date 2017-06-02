@@ -1,6 +1,10 @@
 package sleepless.bt_mouse_client;
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -12,9 +16,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "MainActivity";
+    private static final int REQUEST_ENABLE_BT = 2;
+
+    private BluetoothAdapter mBluetoothAdapter = null;
+    private BluetoothIO mBluetoothIO = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +49,33 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
     }
+
+    protected void onStart() {
+        super.onStart();
+
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        } else {
+            mBluetoothIO = new BluetoothIO(this, mHandler);
+        }
+        getActionBar().setDisplayShowHomeEnabled(false);
+    }
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+
+        }
+    };
 
     @Override
     public void onBackPressed() {
@@ -97,5 +132,17 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    protected void onStop() {
+        super.onStop();
+
+        if (mBluetoothIO != null) {
+            mBluetoothIO.stop();
+        }
+    }
+
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
