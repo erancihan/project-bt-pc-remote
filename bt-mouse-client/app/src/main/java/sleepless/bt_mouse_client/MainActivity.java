@@ -1,6 +1,8 @@
 package sleepless.bt_mouse_client;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mMouseView = (TouchPad) findViewById(R.id.);
+        //mMouseView = (TouchPad) findViewById(R.id.);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             mBluetoothIO = new BluetoothIO(this, mHandler);
         }
-        getActionBar().setDisplayShowHomeEnabled(false);
+        //getActionBar().setDisplayShowHomeEnabled(false);
     }
 
     private final Handler mHandler = new Handler() {
@@ -211,15 +213,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+        FragmentManager fm = getFragmentManager();
         int id = item.getItemId();
 
         if (id == R.id.touchpad) {
-            // Handle the camera action
+            fm.beginTransaction().replace(R.id.content_frame, new TouchpadFragment()).commit();
         } else if (id == R.id.sensor) {
-
+            fm.beginTransaction().replace(R.id.content_frame, new SensorFragment()).commit();
         } else if (id == R.id.settings) {
-
+            fm.beginTransaction().replace(R.id.content_frame, new SettingsFragment()).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
